@@ -20,9 +20,14 @@
 #include <assert.h>
 #include "a3.h"
 #include <omp.h>
+#include <stdio.h>
+#include <time.h>
 
 int main(int argc, char** argv)
-{
+{ 
+  clock_t starttime, endtime;
+  double runtime;
+
   const char *input_file  = argv[1];
   const char *output_file = argv[2];
 
@@ -35,15 +40,18 @@ int main(int argc, char** argv)
   RGB *desired_image;
   int width, height, max;
   desired_image = readPPM(input_file, &width, &height, &max);
-
+  
   // Compute an image
+  starttime = clock();
   RGB *found_image = (RGB*)malloc(width*height*sizeof(RGB));
   compImage(desired_image, width, height, max,
 	    num_generations, population_size, found_image, output_file);
-
+  endtime = clock();
   // Write it back into an output file
   writePPM(output_file, width, height, max, found_image);
 
+  runtime = (double)(endtime-starttime)/CLOCKS_PER_SEC;
+  printf("Computation time %f seconds\n", runtime);
   free(found_image);
   free(desired_image);
 
