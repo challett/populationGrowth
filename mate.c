@@ -1,6 +1,6 @@
-/* 
+/*
     Copyright (C) 2016  N. Perna, N. Nedialkov, T. Gwosdz
-  
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,22 +17,27 @@
 
 
 #include "a3.h"
+#include <omp.h>
+#include <stdio.h>
 
-void mate (Individual *parent1, Individual *parent2, 
-	   Individual *child1, Individual *child2, int width, int height) 
+void mate (Individual *parent1, Individual *parent2,
+	   Individual *child1, Individual *child2, int width, int height)
 {
   int crossover = RANDOM(width*height-1);
   int i;
-  
-  for (i = 0; i < crossover; i++) 
+
+  RGB* child1Image = child1->image;
+  RGB* child2Image = child2->image;
+
+  #pragma omp parallel for
+  for (i = 0; i < crossover; i++)
     {
       child1->image[i] = parent1->image[i];
       child2->image[i] = parent2->image[i];
     }
-  for (i = crossover; i < width*height; i++) 
+  for (i = crossover; i < width*height; i++)
     {
       child1->image[i] = parent2->image[i];
       child2->image[i] = parent1->image[i];
     }
 }
-

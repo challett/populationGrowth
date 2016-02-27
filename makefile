@@ -1,11 +1,19 @@
-CFLAGS= -pg -O2 -Wall -DMONITOR
+CFLAGS= -O2 -DMONITOR
 CC=gcc
 
 PROGRAM_NAME= genimg
-OBJS = main.o readwriteppm.o fitness.o randimage.o compimage.o mate.o mutate.o
+OBJS = main.c readwriteppm.c fitness.c randimage.c compimage.c mate.c mutate.c
 
-$(PROGRAM_NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $? -lgomp
+all: omp acc single
 
 clean:
-	rm  *.o $(PROGRAM_NAME) *~
+	rm  *.o genimg_omp genimg_acc $(PROGRAM_NAME) *~
+
+omp: $(OBJS)
+	$(CC) $(CFLAGS) -fopenmp -o genimg_omp  $?
+
+acc: $(OBJS)
+	pgcc $(CFLAGS) -acc -Minfo=accel -o genimg_acc $?
+
+single: $(OBJS)
+	$(CC) $(CFLAGS) -o genimg $?
