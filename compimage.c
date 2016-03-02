@@ -25,21 +25,19 @@
 #include "a3.h"
 #include "rngs.h"
 
-static int fitnessCompare (const void *a, const void *b)
-{
-  return ((*(Individual*)a).fitness - (*(Individual*)b).fitness);
-}
+
 
 //#pragma acc routine(compFitness) worker
 #pragma acc routine(mate) seq
 // #pragma acc routine(free) seq
-#pragma acc routine(qsort) seq
+#pragma acc routine(quicksort) seq
 
 
 void compImage(const RGB *desired_image, int width, int height, int max,
 	       int num_generations, int population_size,
 	       RGB *found_image, const char *output_file, long *seed)
-{
+{	
+
   #pragma acc data copy(desired_image[0:width*height], seed[0:1])
   {
   /* A. Create an initial population with random images.
@@ -52,7 +50,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
   // Initialize this population with random images
   int i;
-
+printf("started compimage%d\n", 0);
   for (i = 0; i < population_size; i++)
   {
     population[i].image = randomImage(width, height, max, seed);
@@ -66,7 +64,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
    dA = acc_copyin( population[i].image, sizeof(RGB)*width*height ); //device address of RBG array in dA
    acc_memcpy_to_device( &dP[i].image, &dA,  sizeof(RGB*) );
   }
-
+	printf("started compfitness%d\n", 0);
   // Compute the fitness for each individual
   #pragma acc host_data use_device(population)
   {
@@ -74,10 +72,10 @@ void compImage(const RGB *desired_image, int width, int height, int max,
     for (i = 0; i < population_size; i++)
       compFitness(desired_image, population+i, &population[i].image, width, height);
   }
-
+	printf("finished compfitness%d\n", 0);
   // Sort the individuals/images in non-decreasing value of fitness
-  qsort(population, population_size, sizeof(Individual), fitnessCompare);
-
+  quicksort(population, population_size, sizeof(Individual));
+	printf("finished qsort%d\n", 0);
   /* B. Now we can evolve the population over num_generations.
    *************************************************************
    */
@@ -123,7 +121,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
 
       // Sort in non-decreasing fitness
-      qsort(population, population_size, sizeof(Individual), fitnessCompare);
+      quicksort(population, population_size, sizeof(Individual));
       current_fitness = population[0].fitness;
 	     // printf("tophello i've updated. population[0].fitness= %f \n", population[0].fitness);
 

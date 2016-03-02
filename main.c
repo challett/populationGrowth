@@ -51,7 +51,7 @@ int main(int argc, char** argv)
   #ifdef _OPENMP
   ctime1 = omp_get_wtime();
   #endif
-
+	printf("starting compImage%d\n", 0);
   RGB *found_image = (RGB*)malloc(width*height*sizeof(RGB));
   compImage(desired_image, width, height, max,
 	    num_generations, population_size, found_image, output_file, &seed);

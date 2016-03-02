@@ -2,7 +2,7 @@ CFLAGS= -O2 -DMONITOR
 CC=gcc
 
 PROGRAM_NAME= genimg
-OBJS = main.c readwriteppm.c fitness.c randimage.c compimage.c mate.c mutate.c rngs.c
+OBJS = main.c readwriteppm.c fitness.c randimage.c compimage.c mate.c mutate.c rngs.c quicksort.c
 
 all: omp acc single
 
