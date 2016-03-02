@@ -34,10 +34,11 @@ typedef struct {
 RGB * readPPM(const char* file, int* width, int* height, int* max);
 void  writePPM(const char* file, int width, int height, int max, const RGB *image);
 
+
 RGB * randomImage(int width, int height, int max, long *seed);
 
-#pragma acc routine seq
-void  compFitness (const RGB *goal, Individual *I, RGB *curr, int width, int height);
+#pragma acc routine vector
+void  compFitness (const RGB *goal, Individual *I, int width, int height);
 
 void  mate (Individual *parent1, Individual *parent2, Individual *child1, Individual *child2, int width, int height, long *seed);
 #pragma acc routine(mate) seq
@@ -45,8 +46,11 @@ void  mate (Individual *parent1, Individual *parent2, Individual *child1, Indivi
 #pragma acc routine seq
 void  mutate (Individual *curr, int width, int height, int max, long *seed);
 
+void pqsort(Individual *array, size_t nitems, size_t size);
+
 void compImage(const RGB *desired_image, int width, int height, int max,
 	       int num_generations, int population_size,
 	       RGB *found_image, const char *output_file, long *seed);
+
 
 #endif

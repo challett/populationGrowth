@@ -32,7 +32,7 @@ void mate (Individual *parent1, Individual *parent2,
 	   Individual *child1, Individual *child2, int width, int height, long *seed)
 {
 
-	int imageSize = width*height;
+  int imageSize = width*height;
   int crossover = Random(imageSize, seed);
   int i;
 

@@ -53,5 +53,5 @@
     seed[0] = t;
   else
     seed[0] = t + 2147483647;
-  return (int) (((double)seed[0] / 2147483647) * 10000) % max + 1;
+  return (int) ((double)seed[0]) % max + 1;
 }
