@@ -37,7 +37,7 @@ void  writePPM(const char* file, int width, int height, int max, const RGB *imag
 
 RGB * randomImage(int width, int height, int max, long *seed);
 
-#pragma acc routine vector
+#pragma acc routine seq
 void  compFitness (const RGB *goal, Individual *I, int width, int height);
 
 void  mate (Individual *parent1, Individual *parent2, Individual *child1, Individual *child2, int width, int height, long *seed);
