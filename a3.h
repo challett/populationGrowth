@@ -40,10 +40,10 @@ RGB * randomImage(int width, int height, int max, long *seed);
 #pragma acc routine seq
 void  compFitness (const RGB *goal, Individual *I, int width, int height);
 
+#pragma acc routine worker
 void  mate (Individual *parent1, Individual *parent2, Individual *child1, Individual *child2, int width, int height, long *seed);
-#pragma acc routine(mate) seq
 
-#pragma acc routine seq
+#pragma acc routine worker
 void  mutate (Individual *curr, int width, int height, int max, long *seed);
 
 void pqsort(Individual *array, size_t nitems, size_t size);
