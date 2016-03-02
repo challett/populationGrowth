@@ -11,5 +11,4 @@
 
 #pragma acc routine seq
 int Random(int max, long *seeds);
-void   PlantSeeds(long x, long *seeds);
 #endif

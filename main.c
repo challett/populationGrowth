@@ -26,7 +26,7 @@
 
 int main(int argc, char** argv)
 {
-  PlantSeeds(9);
+  long seed = 2342324 ;
 
   clock_t starttime, endtime;
   double runtime;
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 
   RGB *found_image = (RGB*)malloc(width*height*sizeof(RGB));
   compImage(desired_image, width, height, max,
-	    num_generations, population_size, found_image, output_file);
+	    num_generations, population_size, found_image, output_file, &seed);
 
   double ctime2;
   #ifdef _OPENMP

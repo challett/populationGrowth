@@ -25,18 +25,17 @@
 
 // This function generates a random width x height image. max is the
 // largest RGB value in the original image.
-RGB * randomImage(int width, int height, int max)
+RGB * randomImage(int width, int height, int max, long *seed)
 {
-  
+
   RGB *image = (RGB*)malloc(width*height*sizeof(RGB));
   assert(image);
   int i;
   for(i=0; i < width * height; i++)
     {
-      image[i].r = (unsigned char)Random(max);
-      image[i].g = (unsigned char)Random(max);
-      image[i].b = (unsigned char)Random(max);
-      printf("rand: %d \n", Random(max));
+      image[i].r = (unsigned char)Random(max, seed);
+      image[i].g = (unsigned char)Random(max, seed);
+      image[i].b = (unsigned char)Random(max, seed);
     }
   return image;
 }

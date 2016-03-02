@@ -17,7 +17,7 @@
 
 #include "a3.h"
 
-void mutate (Individual *curr, int width, int height, int max)
+void mutate (Individual *curr, int width, int height, int max, long *seed)
 {
   // #pragma acc routine(rand) seq
   // Set how many pixels to mutate. The constant 500 is somewhat
@@ -32,9 +32,9 @@ void mutate (Individual *curr, int width, int height, int max)
       // Pick a pixel at random.
       j = rand() % (width*height);
       // and modify it
-      (curr->image)[j].r = RANDOM(max);
-      (curr->image)[j].g = RANDOM(max);
-      (curr->image)[j].b = RANDOM(max);
+      (curr->image)[j].r = Random(max, seed);
+      (curr->image)[j].g = Random(max, seed);
+      (curr->image)[j].b = Random(max, seed);
 
     }
 }

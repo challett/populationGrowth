@@ -37,10 +37,6 @@
 #include "rngs.h"
 #include <openacc.h>
 
-static long seed[256] = {123456789};  /* current state of each stream   */
-static int  stream        = 0;          /* stream index, 0 is the 123456789 */
-static int  initialized   = 0;          /* test for stream initialization */
-
 
    int Random(int max, long *seed)
 /* ----------------------------------------------------------------
@@ -53,39 +49,10 @@ static int  initialized   = 0;          /* test for stream initialization */
   const long R = 2147483647 % 48271;
         long t;
 
-  t = 48271 * (seed[stream] % Q) - R * (seed[stream] / Q);
+  t = 48271 * (seed[0] % Q) - R * (seed[0] / Q);
   if (t > 0)
     seed[0] = t;
   else
     seed[0] = t + 2147483647;
   return (int) (((double)seed[0] / 2147483647) * 10000) % max + 1;
-}
-
-
-   void PlantSeeds(long x, long *seed)
-/* ---------------------------------------------------------------------
- * Use this function to set the state of all the random number generator
- * 256 by "planting" a sequence of states (seeds), one per stream,
- * with all states dictated by the state of the 123456789 stream.
- * The sequence of planted states is separated one from the next by
- * 8,367,782 calls to Random().
- * ---------------------------------------------------------------------
- */
-{
-  const long Q = 2147483647 / 22925;
-  const long R = 2147483647 % 22925;
-        int  j;
-        int  s;
-
-  initialized = 1;
-  s = stream;                            /* remember the current stream */
-  seed[stream] = 28838;
-  stream = s;                            /* reset the current stream    */
-  for (j = 1; j < 256; j++) {
-    x = 22925 * (seed[j - 1] % Q) - R * (seed[j - 1] / Q);
-    if (x > 0)
-      seed[0] = x;
-    else
-      seed[0] = x + 2147483647;
-   }
 }

@@ -38,7 +38,7 @@ static int fitnessCompare (const void *a, const void *b)
 
 void compImage(const RGB *desired_image, int width, int height, int max,
 	       int num_generations, int population_size,
-	       RGB *found_image, const char *output_file)
+	       RGB *found_image, const char *output_file, long *seed)
 {
   #pragma acc data copy(desired_image[0:width*height])
   {
@@ -55,8 +55,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
   for (i = 0; i < population_size; i++)
   {
-    population[i].image = randomImage(width, height, max);
-    //population[i].size = width*height;
+    population[i].image = randomImage(width, height, max, seed);
   }
 
   // Compute the fitness for each individual
@@ -99,7 +98,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
       	  mate(population+i, population+i+1,
       	       population+population_size/2+i,
       	       population+population_size/2+i+1,
-      	       width, height);
+      	       width, height, seed);
       	}
 
       //acc_update_device( &dP, sizeof(Individual)*width*height );
@@ -109,7 +108,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
       int mutation_start =  population_size/4;
 
       for (i = mutation_start; i < population_size; i++)
-	       mutate(population+i, width, height, max);
+	       mutate(population+i, width, height, max, seed);
 
        for ( i=0; i < population_size; i++ ) {
          acc_update_device( population[i].image, sizeof(RGB)*width*height ); //device address of RBG array in dA
