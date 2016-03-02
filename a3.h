@@ -1,6 +1,6 @@
-/* 
+/*
    Copyright (C) 2016  N. Perna, N. Nedialkov, T. Gwosdz
-  
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -28,19 +28,20 @@ typedef struct {
 typedef struct {
   RGB *image;
   double fitness;
+//  double size;
 } Individual;
-
-#define RANDOM(max)  ( rand() % (max + 1) )
 
 RGB * readPPM(const char* file, int* width, int* height, int* max);
 void  writePPM(const char* file, int width, int height, int max, const RGB *image);
 
 RGB * randomImage(int width, int height, int max);
 
-
-void  compFitness (const RGB *goal, Individual *curr, int width, int height);
+#pragma acc routine seq
+void  compFitness (const RGB *goal, Individual *I, RGB *curr, int width, int height);
 
 void  mate (Individual *parent1, Individual *parent2, Individual *child1, Individual *child2, int width, int height);
+#pragma acc routine(mate) seq
+
 void  mutate (Individual *curr, int width, int height, int max);
 
 void compImage(const RGB *desired_image, int width, int height, int max,

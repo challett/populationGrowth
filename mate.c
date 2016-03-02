@@ -17,25 +17,36 @@
 
 
 #include "a3.h"
+#include "rngs.h"
 #include <omp.h>
 #include <stdio.h>
 
+//#include <curand_kernel.h>
+#include <cuda.h>
+#include <curand.h>
+#include <openacc.h>
+
+
+#pragma acc routine seq
 void mate (Individual *parent1, Individual *parent2,
 	   Individual *child1, Individual *child2, int width, int height)
 {
-  int crossover = RANDOM(width*height-1);
+
+//	curand_init(1234, 0, 0, 0);
+	//curandGenerator_t g;
+
+  int crossover = 5 % (width*height);
   int i;
-
-  RGB* child1Image = child1->image;
-  RGB* child2Image = child2->image;
-
+  int imageSize = width*height;
+//	curandCreateGenerator(&g, CURAND_RNG_PSEUDO_DEFAULT);
   #pragma omp parallel for
   for (i = 0; i < crossover; i++)
     {
       child1->image[i] = parent1->image[i];
       child2->image[i] = parent2->image[i];
     }
-  for (i = crossover; i < width*height; i++)
+  //#pragma acc parallel loop copy(child1Image[1:imageSize], child2Image[1:imageSize], parent1Image[1:imageSize], parent2Image[1:imageSize])
+  for (i = crossover; i < imageSize; i++)
     {
       child1->image[i] = parent2->image[i];
       child2->image[i] = parent1->image[i];

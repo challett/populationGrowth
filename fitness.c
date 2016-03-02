@@ -1,5 +1,5 @@
 /*     Copyright (C) 2016  N. Perna, N. Nedialkov, T. Gwosdz
-  
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,27 +17,30 @@
 
 #include <math.h>
 #include "a3.h"
+#include <omp.h>
+#include <stdio.h>
 
 inline double pixelDistance (const RGB *a, const RGB *b)
 {
-  double rd = a->r-b->r,
-    gd = a->g-b->g,
-    bd = a->b-b->b;
-  
+  double rd = a->r - b->r,
+    gd = a->g - b->g,
+    bd = a->b - b->b;
+
   return rd*rd+gd*gd+bd*bd;
 }
 
-void compFitness (const RGB *A, Individual *B, int width, int height) 
+void compFitness (const RGB *A, Individual *I, RGB *B, int width, int height)
 {
   int i;
   double f = 0;
+  int size = width * height;
 
-  for (i = 0; i < width * height; i++) 
-    f += pixelDistance(&A[i], &(B->image[i]));
+  //RGB* image = B->image;
+  #pragma omp parallel for
+  for (i = 0; i < size; i++){
+    f += pixelDistance(&A[i], &B[i]);
+  }
 
-  B->fitness = f;
+  I->fitness = f;
+
 }
-
-
-
-

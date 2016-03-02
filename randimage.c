@@ -1,7 +1,7 @@
-/* 
+/*
 
     Copyright (C) 2016  N. Perna, N. Nedialkov, T. Gwosdz
-  
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -19,21 +19,24 @@
 
 #include <assert.h>
 #include "a3.h"
+#include "rngs.h"
+#include <stdio.h>
+
 
 // This function generates a random width x height image. max is the
 // largest RGB value in the original image.
-RGB * randomImage(int width, int height, int max) 
+RGB * randomImage(int width, int height, int max)
 {
+  
   RGB *image = (RGB*)malloc(width*height*sizeof(RGB));
   assert(image);
   int i;
-  for(i=0; i < width * height; i++) 
+  for(i=0; i < width * height; i++)
     {
-      image[i].r = RANDOM(max);
-      image[i].g = RANDOM(max);
-      image[i].b = RANDOM(max);
+      image[i].r = (unsigned char)Random(max);
+      image[i].g = (unsigned char)Random(max);
+      image[i].b = (unsigned char)Random(max);
+      printf("rand: %d \n", Random(max));
     }
   return image;
 }
-
-

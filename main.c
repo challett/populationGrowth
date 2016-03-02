@@ -19,12 +19,15 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "a3.h"
+#include "rngs.h"
 #include <omp.h>
 #include <stdio.h>
 #include <time.h>
 
 int main(int argc, char** argv)
-{ 
+{
+  PlantSeeds(9);
+
   clock_t starttime, endtime;
   double runtime;
 
@@ -40,12 +43,25 @@ int main(int argc, char** argv)
   RGB *desired_image;
   int width, height, max;
   desired_image = readPPM(input_file, &width, &height, &max);
-  
+
   // Compute an image
   starttime = clock();
+
+  double ctime1;
+  #ifdef _OPENMP
+  ctime1 = omp_get_wtime();
+  #endif
+
   RGB *found_image = (RGB*)malloc(width*height*sizeof(RGB));
   compImage(desired_image, width, height, max,
 	    num_generations, population_size, found_image, output_file);
+
+  double ctime2;
+  #ifdef _OPENMP
+    ctime2 = omp_get_wtime();
+  #endif
+  printf("%f seconds.\n", ctime2 - ctime1);
+
   endtime = clock();
   // Write it back into an output file
   writePPM(output_file, width, height, max, found_image);
