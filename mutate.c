@@ -16,21 +16,22 @@
 */
 
 #include "a3.h"
+#include "rngs.h"
 
 void mutate (Individual *curr, int width, int height, int max, long *seed)
 {
-  // #pragma acc routine(rand) seq
   // Set how many pixels to mutate. The constant 500 is somewhat
   // random. You can experiment with different constants.
   int rate = width*height/500;
 
 
   int i,j;
-
+  #pragma acc loop 
   for(i=0; i < rate; i++)
     {
       // Pick a pixel at random.
-      j = rand() % (width*height);
+      int size = width*height;
+      j = Random(size ,seed);
       // and modify it
       (curr->image)[j].r = Random(max, seed);
       (curr->image)[j].g = Random(max, seed);

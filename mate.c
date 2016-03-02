@@ -32,13 +32,10 @@ void mate (Individual *parent1, Individual *parent2,
 	   Individual *child1, Individual *child2, int width, int height, long *seed)
 {
 
-//	curand_init(1234, 0, 0, 0);
-	//curandGenerator_t g;
 	int imageSize = width*height;
   int crossover = Random(imageSize, seed);
   int i;
 
-//	curandCreateGenerator(&g, CURAND_RNG_PSEUDO_DEFAULT);
   #pragma omp parallel for
   for (i = 0; i < crossover; i++)
     {

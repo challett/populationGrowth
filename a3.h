@@ -42,6 +42,7 @@ void  compFitness (const RGB *goal, Individual *I, RGB *curr, int width, int hei
 void  mate (Individual *parent1, Individual *parent2, Individual *child1, Individual *child2, int width, int height, long *seed);
 #pragma acc routine(mate) seq
 
+#pragma acc routine seq
 void  mutate (Individual *curr, int width, int height, int max, long *seed);
 
 void compImage(const RGB *desired_image, int width, int height, int max,

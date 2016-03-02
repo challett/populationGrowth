@@ -32,8 +32,7 @@
  * -------------------------------------------------------------------------
  */
 
-#include <stdio.h>
-#include <time.h>
+
 #include "rngs.h"
 #include <openacc.h>
 

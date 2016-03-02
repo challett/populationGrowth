@@ -37,6 +37,7 @@ void compFitness (const RGB *A, Individual *I, RGB *B, int width, int height)
 
   //RGB* image = B->image;
   #pragma omp parallel for
+  //#pragma acc parallel loop
   for (i = 0; i < size; i++){
     f += pixelDistance(&A[i], &B[i]);
   }
