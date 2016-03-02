@@ -24,18 +24,19 @@ void mutate (Individual *curr, int width, int height, int max, long *seed)
   // random. You can experiment with different constants.
   int rate = width*height/500;
 
-
+  long s = *seed;
   int i,j;
-  #pragma acc loop 
+  #pragma acc loop
   for(i=0; i < rate; i++)
     {
+      s+=i;
       // Pick a pixel at random.
       int size = width*height;
       j = Random(size ,seed);
       // and modify it
-      (curr->image)[j].r = Random(max, seed);
-      (curr->image)[j].g = Random(max, seed);
-      (curr->image)[j].b = Random(max, seed);
+      (curr->image)[j].r = Random(max, &(s));
+      (curr->image)[j].g = Random(max, &(s));
+      (curr->image)[j].b = Random(max, &(s));
 
     }
 }

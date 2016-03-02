@@ -77,7 +77,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
   }
   int z;
   // Sort the individuals/images in non-decreasing value of fitness
-  int size = sizeof(Individual);	
+  int size = sizeof(Individual);
   #pragma acc host_data use_device(population)
   {
   #pragma acc parallel loop
@@ -95,60 +95,40 @@ void compImage(const RGB *desired_image, int width, int height, int max,
     {
       prev_fitness = population[0].fitness;
       // The first half mate and replace the second half with children.
-
-      #pragma omp parallel loop
-	int iter = population_size/2;
-      #pragma acc host_data use_device(population,seed)
-      #pragma acc parallel loop copyin(width,height, iter)
-      for (i = 0; i < iter; i += 2)
-        {
-          mate(population+i, population+i+1,
-               population+iter+i,
-               population+iter+i+1,
-               width, height, seed);
-        }
-      
-
-      // Afterer the first 1/4 individuals, each individual can
-      // mutate.
-      int mutation_start =  population_size/4;
-      #pragma acc host_data use_device(population, seed)
+	    int iter = population_size/2;
+      #pragma acc host_data use_device(population,seed, desired_image)
+      #pragma acc kernels
       {
-        #pragma acc parallel loop copyin(width, height, max)
+        for (i = 0; i < iter; i += 2)
+          {
+            mate(population+i, population+i+1,
+                 population+iter+i,
+                 population+iter+i+1,
+                 width, height, seed);
+          }
+
+
+        // Afterer the first 1/4 individuals, each individual can
+        // mutate.
+        int mutation_start =  population_size/4;
         for (i = mutation_start; i < population_size; i++)
-  	       mutate(population+i, width, height, max, seed);
-      }
+           mutate(population+i, width, height, max, seed);
 
- 
-	//  Recompute fitness
-      #pragma omp parallel for
-      #pragma acc host_data use_device(population, desired_image)
-      {
-        #pragma acc parallel loop copyin(width, height)
         for (i = 0; i < population_size; i++)
-      compFitness(desired_image, population+i, width, height);
+          compFitness(desired_image, population+i, width, height);
 
+        int size = sizeof(Individual);
+        // Sort in non-decreasing fitness
+        for(z=0; z<1; z++)
+          pqsort(population, population_size, size);
       }
 
-
-      // Sort in non-decreasing fitness
-	  int size = sizeof(Individual);
-	  #pragma acc host_data use_device(population)
-	  {
-	  #pragma acc parallel loop
-	    for(z=0; z<1; z++)
-	      pqsort(population, population_size, size);
-	  }
-
-	     // printf("tophello i've updated. population[0].fitness= %f \n", population[0].fitness);
-  //for (i=0; i<population_size; i++) {
-    acc_update_self( &(population[0].fitness), sizeof(double) );
-  //}
-      current_fitness = population[0].fitness;
-      double change = -(current_fitness-prev_fitness)/current_fitness* 100;
 
 #ifdef MONITOR
-
+  //* Update best fit on host for reporting*//
+  acc_update_self( &(population[0].fitness), sizeof(double) );
+  current_fitness = population[0].fitness;
+  double change = -(current_fitness-prev_fitness)/current_fitness* 100;
       // If compiled with flag -DMONITOR, update the output file every
       // 300 iterations and the fitness of the closest image.
       // This is useful for monitoring progress.

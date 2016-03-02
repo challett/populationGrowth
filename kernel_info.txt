@@ -1,0 +1,40 @@
+Accelerator Kernel Timing data
+/nfs/u50/hallec3/4fa3/a3/compimage.c
+  compImage  NVIDIA  devicenum=0
+    time(us): 696,701
+    44: data region reached 1 time
+        1: data copyin transfers: 101
+             device time(us): total=1,149 max=25 min=11 avg=11
+        1: data copyout transfers: 1
+             device time(us): total=12 max=12 min=12 avg=12
+        44: data copyin transfers: 102
+             device time(us): total=550 max=35 min=4 avg=5
+        122: data copyout transfers: 10000
+             device time(us): total=176,484 max=203 min=2 avg=17
+    74: compute region reached 1 time
+        74: kernel launched 1 time
+            grid: [1]  block: [256]
+             device time(us): total=124 max=124 min=124 avg=124
+            elapsed time(us): total=139 max=139 min=139 avg=139
+    83: compute region reached 1 time
+        83: kernel launched 1 time
+            grid: [1]  block: [256]
+             device time(us): total=39 max=39 min=39 avg=39
+            elapsed time(us): total=75 max=75 min=75 avg=75
+    100: compute region reached 10000 times
+        102: kernel launched 10000 times
+            grid: [25]  block: [32x8]
+             device time(us): total=271,256 max=325 min=2 avg=27
+            elapsed time(us): total=491,525 max=11,066 min=22 avg=49
+        114: kernel launched 10000 times
+            grid: [75]  block: [32x8]
+             device time(us): total=96,418 max=204 min=2 avg=9
+            elapsed time(us): total=240,518 max=840 min=17 avg=24
+        117: kernel launched 10000 times
+            grid: [1]  block: [128]
+             device time(us): total=75,749 max=782 min=2 avg=7
+            elapsed time(us): total=230,330 max=4,508 min=15 avg=23
+        122: kernel launched 10000 times
+            grid: [1]  block: [32]
+             device time(us): total=74,920 max=559 min=2 avg=7
+            elapsed time(us): total=972,700 max=106,558 min=15 avg=97

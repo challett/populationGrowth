@@ -22,6 +22,7 @@ inline double pixelDistance (const RGB *a, const RGB *b)
   double rd = a->r - b->r,
     gd = a->g - b->g,
     bd = a->b - b->b;
+
   return rd*rd+gd*gd+bd*bd;
 }
 

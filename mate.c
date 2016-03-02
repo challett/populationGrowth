@@ -26,8 +26,6 @@
 #include <curand.h>
 #include <openacc.h>
 
-
-#pragma acc routine seq
 void mate (Individual *parent1, Individual *parent2,
 	   Individual *child1, Individual *child2, int width, int height, long *seed)
 {
@@ -36,13 +34,14 @@ void mate (Individual *parent1, Individual *parent2,
   int crossover = Random(imageSize, seed);
   int i;
 
+	#pragma acc loop
   #pragma omp parallel for
   for (i = 0; i < crossover; i++)
     {
       child1->image[i] = parent1->image[i];
       child2->image[i] = parent2->image[i];
     }
-  //#pragma acc parallel loop copy(child1Image[1:imageSize], child2Image[1:imageSize], parent1Image[1:imageSize], parent2Image[1:imageSize])
+  #pragma acc loop
   for (i = crossover; i < imageSize; i++)
     {
       child1->image[i] = parent2->image[i];
