@@ -79,7 +79,6 @@ void compImage(const RGB *desired_image, int width, int height, int max,
     for(z=0; z<1; z++)
       pqsort(population, population_size, size);
   }
-	printf("after pqsort\n");
   /* B. Now we can evolve the population over num_generations.
    *************************************************************
    */
@@ -88,12 +87,13 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
   for (g = 0; g < num_generations; g++)
     {
-      prev_fitness = population[0].fitness;
-      // The first half mate and replace the second half with children.
-	    int iter = population_size/2;
-      //#pragma acc host_data use_device(population,seed, desired_image)
+      // prev_fitness = population[0].fitness;
+      // // The first half mate and replace the second half with children.
+      // //#pragma acc host_data use_device(population,seed, desired_image)
       #pragma acc kernels
       {
+        int iter = population_size/2;
+
         for (i = 0; i < iter; i += 2)
           {
             mate(population+i, population+i+1,
@@ -141,16 +141,16 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
       #ifdef MONITOR
         //* Update best fit on host for reporting*//
-        acc_update_self( &(population[0].fitness), sizeof(double) );
-        current_fitness = population[0].fitness;
-        double change = -(current_fitness-prev_fitness)/current_fitness* 100;
-            // If compiled with flag -DMONITOR, update the output file every
-            // 300 iterations and the fitness of the closest image.
-            // This is useful for monitoring progress.
-            if ( g % 300 == 0)
-      	writePPM(output_file, width, height, max, population[0].image);
-
-      	 printf("generation %d fitness %f change %f% \n ",    g, current_fitness, change);
+        // acc_update_self( &(population[0].fitness), sizeof(double) );
+        // current_fitness = population[0].fitness;
+        // double change = -(current_fitness-prev_fitness)/current_fitness* 100;
+        //     // If compiled with flag -DMONITOR, update the output file every
+        //     // 300 iterations and the fitness of the closest image.
+        //     // This is useful for monitoring progress.
+        //     if ( g % 300 == 0)
+      	// writePPM(output_file, width, height, max, population[0].image);
+        //
+      	//  printf("generation %d fitness %f change %f% \n ",    g, current_fitness, change);
       #endif
     }
   acc_copyout(population[0].image, height*width*sizeof(RGB));

@@ -26,9 +26,10 @@
 
 int main(int argc, char** argv)
 {
+  clock_t starttime, endtime;
+  starttime = clock();
   long seed = 2342324 ;
 
-  clock_t starttime, endtime;
   double runtime;
 
   const char *input_file  = argv[1];
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
   desired_image = readPPM(input_file, &width, &height, &max);
 
   // Compute an image
-  starttime = clock();
+
 
   double ctime1;
   #ifdef _OPENMP
@@ -59,8 +60,8 @@ int main(int argc, char** argv)
   double ctime2;
   #ifdef _OPENMP
     ctime2 = omp_get_wtime();
-  #endif
   printf("%f seconds.\n", ctime2 - ctime1);
+  #endif
 
   endtime = clock();
   // Write it back into an output file

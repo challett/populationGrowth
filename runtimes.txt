@@ -1,0 +1,4 @@
+Mar 2 2016, 9:42PM: [hallec3@tesla ~/4fa3/a3] ./genimg_acc image2.ppm image2_10000_100.ppm 10000 100
+image2.ppm is a PPM file
+256 x 256 image, max value= 255
+Computation time 24.420000 seconds
