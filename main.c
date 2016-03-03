@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <sys/time.h>
 #include <stdlib.h>
 #include <assert.h>
 #include "a3.h"
@@ -26,6 +26,9 @@
 
 int main(int argc, char** argv)
 {
+  struct timeval start, end;
+  gettimeofday(&start, NULL);
+
   clock_t starttime, endtime;
   starttime = clock();
   long seed = 2342324 ;
@@ -62,12 +65,14 @@ int main(int argc, char** argv)
     ctime2 = omp_get_wtime();
   printf("%f seconds.\n", ctime2 - ctime1);
   #endif
-
+	
   endtime = clock();
   // Write it back into an output file
   writePPM(output_file, width, height, max, found_image);
 
-  runtime = (double)(endtime-starttime)/CLOCKS_PER_SEC;
+    gettimeofday(&end, NULL);
+  runtime = end.tv_sec-start.tv_sec+(end.tv_usec - start.tv_usec)*1.e-6;
+  //runtime = (double)(endtime-starttime)/CLOCKS_PER_SEC;
   printf("Computation time %f seconds\n", runtime);
   free(found_image);
   free(desired_image);

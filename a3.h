@@ -34,7 +34,6 @@ typedef struct {
 RGB * readPPM(const char* file, int* width, int* height, int* max);
 void  writePPM(const char* file, int width, int height, int max, const RGB *image);
 
-
 RGB * randomImage(int width, int height, int max, long *seed);
 
 #pragma acc routine seq

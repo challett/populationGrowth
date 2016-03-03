@@ -66,12 +66,26 @@ void compImage(const RGB *desired_image, int width, int height, int max,
   }
 #endif
   // Compute the fitness for each individual
-  #pragma acc host_data use_device(population)
-  {
-    #pragma acc parallel loop
-    for (i = 0; i < population_size; i++)
-      compFitness(desired_image, population+i, width, height);
-  }
+  #pragma acc parallel loop
+  for (i = 0; i < population_size; i++)
+      {
+        int j;
+        double f = 0;
+        RGB* image = population[i].image;
+        double rd, gd, bd;
+        RGB a, b;
+        for (j = 0; j < width * height; j++)
+          {
+              a = desired_image[j];
+              b = image[j];
+              rd = a.r - b.r;
+              gd = a.g - b.g;
+              bd = a.b - b.b;
+
+            f += rd*rd+gd*gd+bd*bd;
+          }
+        population[i].fitness = f;
+      }
   int z;
   // Sort the individuals/images in non-decreasing value of fitness
   int size = sizeof(Individual);
@@ -95,7 +109,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
       #pragma acc kernels
       {
         int iter = population_size/2;
-
+        #pragma acc loop independent
         for (i = 0; i < iter; i += 2)
           {
             mate(population+i, population+i+1,
@@ -108,8 +122,27 @@ void compImage(const RGB *desired_image, int width, int height, int max,
         // Afterer the first 1/4 individuals, each individual can
         // mutate.
         int mutation_start =  population_size/4;
+        #pragma acc loop independent
         for (i = mutation_start; i < population_size; i++)
-           mutate(population+i, width, height, max, seed);
+          {
+            int rate = width*height/500;
+
+
+            int j,k;
+            #pragma acc loop independent
+            for(j=0; j < rate; j++)
+              {
+                // Pick a pixel at random.
+                int size = width*height;
+                k = Random(size ,seed);
+                // and modify it
+                population[i].image[k].r = Random(max, seed);
+                population[i].image[k].g = Random(max, seed);
+                population[i].image[k].b = Random(max, seed);
+
+              }
+          }
+           //mutate(population+i, width, height, max, seed);
 
         for (i = 0; i < population_size; i++)
           {
@@ -128,12 +161,8 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
                 f += rd*rd+gd*gd+bd*bd;
               }
-              //f += pixelDistance(&A[j], &(image[j]));
-
             population[i].fitness = f;
           }
-          //compFitness(desired_image, population+i, width, height);
-
         int size = sizeof(Individual);
         // Sort in non-decreasing fitness
         for(z=0; z<1; z++)
@@ -152,9 +181,21 @@ void compImage(const RGB *desired_image, int width, int height, int max,
             // 300 iterations and the fitness of the closest image.
             // This is useful for monitoring progress.
             if ( g % 300 == 0)
-      	writePPM(output_file, width, height, max, population[0].image);
+      	       writePPM(output_file, width, height, max, population[0].image);
 
       	 printf("generation %d fitness %f change %f% \n ",    g, current_fitness, change);
+      #endif
+      #ifdef VIDEO
+        if (g % 5 == 0){
+          //acc_copyout(population[0], sizeof(Individual))
+          acc_update_self(population[0].image, height*width*sizeof(RGB));
+          printf("outputting image for video\n");
+          char fileName[200], command[200];
+          sprintf(fileName, "output/outimage_%d.ppm", g);
+          sprintf(command, "convert output/outimage_%d.ppm output/outimage_%d.jpg", g, g);
+          writePPM(fileName, width, height, max, population[0].image);
+          system(command);
+        }
       #endif
     }
   #ifdef _OPENACC
