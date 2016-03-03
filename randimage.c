@@ -29,7 +29,7 @@ RGB * randomImage(int width, int height, int max, long *seed)
 {
 
   RGB *image = (RGB*)malloc(width*height*sizeof(RGB));
-  assert(image);
+  //assert(image);
   int i;
   for(i=0; i < width * height; i++)
     {

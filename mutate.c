@@ -27,6 +27,7 @@ void mutate (Individual *curr, int width, int height, int max, long *seed)
 
   int i,j;
   #pragma acc loop independent worker
+  #pragma omp parallel for
   for(i=0; i < rate; i++)
     {
       // Pick a pixel at random.

@@ -21,3 +21,33 @@ image2.ppm is a PPM file
 256 x 256 image, max value= 255
 Computation time 29.594257 seconds
 (k5000)
+
+
+on mills:
+May 3 2016: 5:40PM
+1 thread: [hallec3@mills ~/4fa3/a3] ./genimg_omp image2.ppm image2_10000_100 10000 100
+image2.ppm is a PPM file
+256 x 256 image, max value= 255
+501.905198 seconds.
+Computation time 501.985711 seconds
+
+5:46PM
+2 thread: [hallec3@mills ~/4fa3/a3] ./genimg_omp image2.ppm image2_10000_100 10000 100
+image2.ppm is a PPM file
+256 x 256 image, max value= 255
+262.188197 seconds.
+Computation time 262.256037 seconds
+
+5:48PM
+4 thread: [hallec3@mills ~/4fa3/a3] ./genimg_omp image2.ppm image2_10000_100 10000 100
+image2.ppm is a PPM file
+256 x 256 image, max value= 255
+162.628450 seconds.
+Computation time 162.698044 seconds
+
+5:58PM
+[hallec3@mills ~/4fa3/a3] ./genimg_omp image2.ppm image2_10000_100 10000 100
+image2.ppm is a PPM file
+256 x 256 image, max value= 255
+112.120562 seconds.
+Computation time 112.188727 seconds

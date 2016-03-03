@@ -1,8 +1,8 @@
-CFLAGS= -O2 -DMONITOR
+CFLAGS= -O2 #-DMONITOR #-DVIDEO
 CC=gcc
 
 PROGRAM_NAME= genimg
-OBJS = main.c readwriteppm.c fitness.c randimage.c compimage.c mate.c mutate.c rngs.c quicksort.c
+OBJS = main.c readwriteppm.c fitness.c randimage.c compimage.c mate.c mutate.c rngs.c
 
 all: omp acc single
 
@@ -13,7 +13,7 @@ omp: $(OBJS)
 	$(CC) $(CFLAGS) -fopenmp -o genimg_omp  $?
 
 acc: $(OBJS)
-	pgcc $(CFLAGS) -acc -Minfo=accel -fast -ta=tesla,time -I/usr/local/pgi/linux86-64/2014/cuda/6.0/include -o genimg_acc  $?
+	pgcc $(CFLAGS) -acc -Minfo=accel -fast -ta=tesla -Msafeptr  -o genimg_acc  $?
 
 single: $(OBJS)
 	$(CC) $(CFLAGS) -o genimg $?

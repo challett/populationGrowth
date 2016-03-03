@@ -65,35 +65,38 @@ void compImage(const RGB *desired_image, int width, int height, int max,
    acc_memcpy_to_device( &dP[i].image, &dA,  sizeof(RGB*) );
   }
 #endif
-  // Compute the fitness for each individual
-  #pragma acc parallel loop
-  for (i = 0; i < population_size; i++)
-      {
-        int j;
-        double f = 0;
-        RGB* image = population[i].image;
-        double rd, gd, bd;
-        RGB a, b;
-        for (j = 0; j < width * height; j++)
-          {
-              a = desired_image[j];
-              b = image[j];
-              rd = a.r - b.r;
-              gd = a.g - b.g;
-              bd = a.b - b.b;
+int z;
 
-            f += rd*rd+gd*gd+bd*bd;
-          }
-        population[i].fitness = f;
-      }
-  int z;
-  // Sort the individuals/images in non-decreasing value of fitness
-  int size = sizeof(Individual);
-  #pragma acc host_data use_device(population)
+  // Compute the fitness for each individual
+  #pragma acc kernels
   {
-  #pragma acc parallel loop
-    for(z=0; z<1; z++)
-      pqsort(population, population_size, size);
+    #pragma acc loop independent
+    for (i = 0; i < population_size; i++)
+        {
+          int j;
+          double f = 0;
+          RGB* image = population[i].image;
+          double rd, gd, bd;
+          RGB a, b;
+          #pragma acc loop independent
+          for (j = 0; j < width * height; j++)
+            {
+                a = desired_image[j];
+                b = image[j];
+                rd = a.r - b.r;
+                gd = a.g - b.g;
+                bd = a.b - b.b;
+
+              f += rd*rd+gd*gd+bd*bd;
+            }
+          population[i].fitness = f;
+        }
+    // Sort the individuals/images in non-decreasing value of fitness
+    int size = sizeof(Individual);
+
+      for(z=0; z<1; z++)
+        pqsort(population, population_size, size);
+
   }
   /* B. Now we can evolve the population over num_generations.
    *************************************************************
@@ -109,6 +112,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
       #pragma acc kernels
       {
         int iter = population_size/2;
+        #pragma omp parallel for
         #pragma acc loop independent
         for (i = 0; i < iter; i += 2)
           {
@@ -129,6 +133,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
 
             int j,k;
+            #pragma omp parallel for
             #pragma acc loop independent
             for(j=0; j < rate; j++)
               {
@@ -143,7 +148,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
               }
           }
            //mutate(population+i, width, height, max, seed);
-
+        #pragma omp parallel for
         for (i = 0; i < population_size; i++)
           {
             int j;
