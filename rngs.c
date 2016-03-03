@@ -34,7 +34,9 @@
 
 
 #include "rngs.h"
-#include <openacc.h>
+#ifdef _OPENACC
+  #include <openacc.h>
+#endif
 
 
    int Random(int max, long *seed)

@@ -21,7 +21,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
-#include <openacc.h>
+#ifdef _OPENACC
+  #include <openacc.h>
+#endif
 
 #include "a3.h"
 #include "rngs.h"
@@ -56,13 +58,13 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
   RGB *dA;
   Individual *dP;
-
+#ifdef _OPENACC
   dP = acc_copyin( population, sizeof( Individual )*population_size ); //device address of population
   for ( i=0; i < population_size; i++ ) {
    dA = acc_copyin( population[i].image, sizeof(RGB)*width*height ); //device address of RBG array in dA
    acc_memcpy_to_device( &dP[i].image, &dA,  sizeof(RGB*) );
   }
-
+#endif
   // Compute the fitness for each individual
   #pragma acc host_data use_device(population)
   {
@@ -87,7 +89,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
   for (g = 0; g < num_generations; g++)
     {
-      // prev_fitness = population[0].fitness;
+      prev_fitness = population[0].fitness;
       // // The first half mate and replace the second half with children.
       // //#pragma acc host_data use_device(population,seed, desired_image)
       #pragma acc kernels
@@ -141,19 +143,23 @@ void compImage(const RGB *desired_image, int width, int height, int max,
 
       #ifdef MONITOR
         //* Update best fit on host for reporting*//
-        // acc_update_self( &(population[0].fitness), sizeof(double) );
-        // current_fitness = population[0].fitness;
-        // double change = -(current_fitness-prev_fitness)/current_fitness* 100;
-        //     // If compiled with flag -DMONITOR, update the output file every
-        //     // 300 iterations and the fitness of the closest image.
-        //     // This is useful for monitoring progress.
-        //     if ( g % 300 == 0)
-      	// writePPM(output_file, width, height, max, population[0].image);
-        //
-      	//  printf("generation %d fitness %f change %f% \n ",    g, current_fitness, change);
+        #ifdef _OPENACC
+          acc_update_self( &(population[0].fitness), sizeof(double) );
+        #endif
+        current_fitness = population[0].fitness;
+        double change = -(current_fitness-prev_fitness)/current_fitness* 100;
+            // If compiled with flag -DMONITOR, update the output file every
+            // 300 iterations and the fitness of the closest image.
+            // This is useful for monitoring progress.
+            if ( g % 300 == 0)
+      	writePPM(output_file, width, height, max, population[0].image);
+
+      	 printf("generation %d fitness %f change %f% \n ",    g, current_fitness, change);
       #endif
     }
-  acc_copyout(population[0].image, height*width*sizeof(RGB));
+  #ifdef _OPENACC
+    acc_copyout(population[0].image, height*width*sizeof(RGB));
+  #endif
   // Return the image that is found
   memmove(found_image, population[0].image, width*height*sizeof(RGB));
 
@@ -198,5 +204,5 @@ static void sort(Individual *array, size_t size, int begin, int end) {
 #pragma acc routine(swap) seq
 #pragma acc routine(sort) seq
 void pqsort(Individual *array, size_t nitems, size_t size) {
-   sort(array, 1, 0, nitems);
+   sort(array, 1, 0, nitems-1);
 }

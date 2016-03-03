@@ -20,8 +20,9 @@
 #include "rngs.h"
 #include <omp.h>
 #include <stdio.h>
-
-#include <openacc.h>
+#ifdef _OPENACC
+	#include <openacc.h>
+#endif
 
 void mate (Individual *parent1, Individual *parent2,
 	   Individual *child1, Individual *child2, int width, int height, long *seed)
