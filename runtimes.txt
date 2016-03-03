@@ -2,3 +2,22 @@ Mar 2 2016, 9:42PM: [hallec3@tesla ~/4fa3/a3] ./genimg_acc image2.ppm image2_100
 image2.ppm is a PPM file
 256 x 256 image, max value= 255
 Computation time 24.420000 seconds
+(tesla)
+
+Mar 3 2016 4:49PM: [hallec3@tesla ~/4fa3/a3] ./genimg_acc image2.ppm image2_10000_100.ppm 10000 100
+image2.ppm is a PPM file
+256 x 256 image, max value= 255
+Computation time 25.199601 seconds
+(tesla)
+
+Mar 3 2016 5:09PM: [hallec3@gpu3 ~/4fa3/a3] ./genimg_acc image2.ppm image2_10000_100.ppm 10000 100
+image2.ppm is a PPM file
+256 x 256 image, max value= 255
+Computation time 58.713018 seconds
+(k2000)
+
+[hallec3@gpu2 ~/4fa3/a3] ./genimg_acc image2.ppm image2_10000_100.ppm 10000 100
+image2.ppm is a PPM file
+256 x 256 image, max value= 255
+Computation time 29.594257 seconds
+(k5000)
