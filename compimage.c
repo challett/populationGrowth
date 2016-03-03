@@ -26,11 +26,6 @@
 #include "a3.h"
 #include "rngs.h"
 
-static int fitnessCompare (const void *a, const void *b)
-{
-  return ((*(Individual*)a).fitness - (*(Individual*)b).fitness);
-}
-
 //#pragma acc routine(compFitness) worker
 // #pragma acc routine(mate) seq
 // #pragma acc routine(free) seq
@@ -96,7 +91,7 @@ void compImage(const RGB *desired_image, int width, int height, int max,
       prev_fitness = population[0].fitness;
       // The first half mate and replace the second half with children.
 	    int iter = population_size/2;
-      #pragma acc host_data use_device(population,seed, desired_image)
+      //#pragma acc host_data use_device(population,seed, desired_image)
       #pragma acc kernels
       {
         for (i = 0; i < iter; i += 2)
@@ -115,7 +110,27 @@ void compImage(const RGB *desired_image, int width, int height, int max,
            mutate(population+i, width, height, max, seed);
 
         for (i = 0; i < population_size; i++)
-          compFitness(desired_image, population+i, width, height);
+          {
+            int j;
+            double f = 0;
+            RGB* image = population[i].image;
+            double rd, gd, bd;
+            RGB a, b;
+            for (j = 0; j < width * height; j++)
+              {
+                  a = desired_image[j];
+                  b = image[j];
+                  rd = a.r - b.r;
+                  gd = a.g - b.g;
+                  bd = a.b - b.b;
+
+                f += rd*rd+gd*gd+bd*bd;
+              }
+              //f += pixelDistance(&A[j], &(image[j]));
+
+            population[i].fitness = f;
+          }
+          //compFitness(desired_image, population+i, width, height);
 
         int size = sizeof(Individual);
         // Sort in non-decreasing fitness
@@ -124,21 +139,21 @@ void compImage(const RGB *desired_image, int width, int height, int max,
       }
 
 
-#ifdef MONITOR
-  //* Update best fit on host for reporting*//
-  acc_update_self( &(population[0].fitness), sizeof(double) );
-  current_fitness = population[0].fitness;
-  double change = -(current_fitness-prev_fitness)/current_fitness* 100;
-      // If compiled with flag -DMONITOR, update the output file every
-      // 300 iterations and the fitness of the closest image.
-      // This is useful for monitoring progress.
-      if ( g % 300 == 0)
-	writePPM(output_file, width, height, max, population[0].image);
+      #ifdef MONITOR
+        //* Update best fit on host for reporting*//
+        acc_update_self( &(population[0].fitness), sizeof(double) );
+        current_fitness = population[0].fitness;
+        double change = -(current_fitness-prev_fitness)/current_fitness* 100;
+            // If compiled with flag -DMONITOR, update the output file every
+            // 300 iterations and the fitness of the closest image.
+            // This is useful for monitoring progress.
+            if ( g % 300 == 0)
+      	writePPM(output_file, width, height, max, population[0].image);
 
-	 printf("generation %d fitness %f change %f% \n ",    g, current_fitness, change);
-#endif
+      	 printf("generation %d fitness %f change %f% \n ",    g, current_fitness, change);
+      #endif
     }
-    acc_copyout(population[0].image, height*width*sizeof(RGB));
+  acc_copyout(population[0].image, height*width*sizeof(RGB));
   // Return the image that is found
   memmove(found_image, population[0].image, width*height*sizeof(RGB));
 

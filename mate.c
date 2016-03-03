@@ -21,9 +21,6 @@
 #include <omp.h>
 #include <stdio.h>
 
-//#include <curand_kernel.h>
-#include <cuda.h>
-#include <curand.h>
 #include <openacc.h>
 
 void mate (Individual *parent1, Individual *parent2,
@@ -34,17 +31,20 @@ void mate (Individual *parent1, Individual *parent2,
   int crossover = Random(imageSize, seed);
   int i;
 
-	#pragma acc loop
+	{
   #pragma omp parallel for
+	#pragma acc loop independent worker
   for (i = 0; i < crossover; i++)
     {
       child1->image[i] = parent1->image[i];
       child2->image[i] = parent2->image[i];
     }
-  #pragma acc loop
+	}
+  #pragma acc loop independent worker
   for (i = crossover; i < imageSize; i++)
     {
       child1->image[i] = parent2->image[i];
       child2->image[i] = parent1->image[i];
     }
+
 }
