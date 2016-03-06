@@ -28,11 +28,6 @@
 #include "a3.h"
 #include "rngs.h"
 
-//#pragma acc routine(compFitness) worker
-// #pragma acc routine(mate) seq
-// #pragma acc routine(free) seq
-
-
 void compImage(const RGB *desired_image, int width, int height, int max,
 	       int num_generations, int population_size,
 	       RGB *found_image, const char *output_file, long *seed)
@@ -80,7 +75,7 @@ int z;
           double rd, gd, bd;
           RGB a, b;
           #pragma acc loop independent
-		  #pragma omp parallel for 
+		  #pragma omp parallel for
           for (j = 0; j < width * height; j++)
             {
                 a = desired_image[j];
@@ -95,9 +90,8 @@ int z;
         }
     // Sort the individuals/images in non-decreasing value of fitness
     int size = sizeof(Individual);
-
-      for(z=0; z<1; z++)
-        pqsort(population, population_size, size);
+    for(z=0; z<1; z++)
+      pqsort(population, population_size, size);
 
   }
   /* B. Now we can evolve the population over num_generations.
@@ -109,7 +103,6 @@ int z;
     {
       prev_fitness = population[0].fitness;
       // // The first half mate and replace the second half with children.
-      // //#pragma acc host_data use_device(population,seed, desired_image)
       #pragma acc kernels
       {
         int iter = population_size/2;
@@ -124,18 +117,16 @@ int z;
           }
 
 
-        // Afterer the first 1/4 individuals, each individual can
-        // mutate.
+        // Afterer the first 1/4 individuals, each individual can mutate.
         int mutation_start =  population_size/4;
         #pragma acc loop independent
-		#pragma omp parallel for
+		    #pragma omp parallel for
         for (i = mutation_start; i < population_size; i++)
           {
             int rate = width*height/500;
 
-
             int j,k;
-            #pragma omp parallel for 
+            #pragma omp parallel for
             #pragma acc loop independent
             for(j=0; j < rate; j++)
               {
@@ -149,7 +140,6 @@ int z;
 
               }
           }
-           //mutate(population+i, width, height, max, seed);
         #pragma omp parallel for
         for (i = 0; i < population_size; i++)
           {
@@ -158,7 +148,7 @@ int z;
             RGB* image = population[i].image;
             double rd, gd, bd;
             RGB a, b;
-			#pragma omp parallel for
+			      #pragma omp parallel for
             for (j = 0; j < width * height; j++)
               {
                   a = desired_image[j];
@@ -188,14 +178,13 @@ int z;
             // If compiled with flag -DMONITOR, update the output file every
             // 300 iterations and the fitness of the closest image.
             // This is useful for monitoring progress.
-            if ( g % 300 == 0)
-      	       writePPM(output_file, width, height, max, population[0].image);
+          if ( g % 300 == 0)
+    	       writePPM(output_file, width, height, max, population[0].image);
 
       	 printf("generation %d fitness %f change %f% \n ",    g, current_fitness, change);
       #endif
       #ifdef VIDEO
         if (g % 5 == 0){
-          //acc_copyout(population[0], sizeof(Individual))
           acc_update_self(population[0].image, height*width*sizeof(RGB));
           printf("outputting image for video\n");
           char fileName[200], command[200];

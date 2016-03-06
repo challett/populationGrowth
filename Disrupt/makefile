@@ -1,8 +1,8 @@
-CFLAGS= -O2  -DVIDEO -DDISRUPT #-DMONITOR 
+CFLAGS= -O2  -DVIDEO -DDISRUPT #-DMONITOR
 CC=gcc
 
 PROGRAM_NAME= genimg
-OBJS = main.c readwriteppm.c fitness.c randimage.c compimage.c mate.c mutate.c rngs.c
+OBJS = main.c readwriteppm.c randimage.c compimage.c mate.c rngs.c
 
 all: omp acc single
 
