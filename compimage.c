@@ -71,6 +71,7 @@ int z;
   #pragma acc kernels
   {
     #pragma acc loop independent
+	#pragma omp parallel for
     for (i = 0; i < population_size; i++)
         {
           int j;
@@ -79,6 +80,7 @@ int z;
           double rd, gd, bd;
           RGB a, b;
           #pragma acc loop independent
+		  #pragma omp parallel for 
           for (j = 0; j < width * height; j++)
             {
                 a = desired_image[j];
@@ -103,7 +105,6 @@ int z;
    */
   int g;
   double prev_fitness, current_fitness;
-
   for (g = 0; g < num_generations; g++)
     {
       prev_fitness = population[0].fitness;
@@ -127,13 +128,14 @@ int z;
         // mutate.
         int mutation_start =  population_size/4;
         #pragma acc loop independent
+		#pragma omp parallel for
         for (i = mutation_start; i < population_size; i++)
           {
             int rate = width*height/500;
 
 
             int j,k;
-            #pragma omp parallel for
+            #pragma omp parallel for 
             #pragma acc loop independent
             for(j=0; j < rate; j++)
               {
@@ -156,6 +158,7 @@ int z;
             RGB* image = population[i].image;
             double rd, gd, bd;
             RGB a, b;
+			#pragma omp parallel for
             for (j = 0; j < width * height; j++)
               {
                   a = desired_image[j];

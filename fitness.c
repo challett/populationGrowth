@@ -31,7 +31,6 @@ void compFitness (const RGB *A, Individual *B, int width, int height)
   int i;
   double f = 0;
   RGB* image = B->image;
-
   for (i = 0; i < width * height; i++)
     f += pixelDistance(&A[i], &(image[i]));
 

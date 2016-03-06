@@ -34,12 +34,24 @@ int main(int argc, char** argv)
   long seed = 2342324 ;
 
   double runtime;
+  
+  #ifdef _OPENMP
+  int thread_count = atoi(argv[1]);
+  const char *input_file  = argv[2];
+  const char *output_file = argv[3];
 
+  int num_generations = atoi(argv[4]);
+  int population_size = atoi(argv[5]);
+  omp_set_num_threads(thread_count);
+  #else
   const char *input_file  = argv[1];
   const char *output_file = argv[2];
 
   int num_generations = atoi(argv[3]);
   int population_size = atoi(argv[4]);
+  
+  #endif
+  
   // population size, must be multiple of 4 right now
   assert(population_size % 4 == 0);
 

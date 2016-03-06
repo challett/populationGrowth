@@ -41,6 +41,7 @@ void mate (Individual *parent1, Individual *parent2,
       child2->image[i] = parent2->image[i];
     }
 	}
+  #pragma omp parallel for
   #pragma acc loop independent worker
   for (i = crossover; i < imageSize; i++)
     {

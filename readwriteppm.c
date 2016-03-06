@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-
+#include <omp.h>
 #include "a3.h"
 
 void writePPM(const char* file, int width, int height, int max, const RGB *image)
@@ -36,6 +36,7 @@ void writePPM(const char* file, int width, int height, int max, const RGB *image
   fprintf(fd, "%d %d\n%d\n", width, height, max);
   
   // write the image
+  #pragma omp parallel for
   for(i = 0; i < height*width; i++)
     {
       const RGB *p = image+i;
