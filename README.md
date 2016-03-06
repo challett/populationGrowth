@@ -21,4 +21,6 @@ Run with:
   ./genimg_acc inputppmfile.ppm outputppmfile.ppm num_generations population_size
 ```
 
+To create intermediate images, add -DVIDEO flag to makefile
+
 Example of output: https://www.youtube.com/watch?v=nAOQSPdggbQ
